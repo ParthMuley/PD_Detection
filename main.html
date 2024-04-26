@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictions</title>
+    <style>
+        /* CSS styles */
+        /* Center-align container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Adjust as needed for full-screen height */
+        }
+
+        /* Style for prediction bar */
+        #prediction {
+            margin-top: 20px; /* Add spacing above prediction */
+        }
+
+        /* Style for specific input fields */
+        .symptom-input {
+            display: none; /* Initially hide specific input fields */
+            margin-bottom: 10px;
+        }
+
+        /* Style for two-column layout */
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .two-columns > div {
+            width: 5; /* Adjust as needed */
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Input for text -->
+        <input id="PatientID" type="text" placeholder="PatientID" style="margin-bottom: 10px;">
+
+        <!-- Dropdown menu for symptom type selection -->
+        <select id="symptomType" onchange="handleSymptomTypeChange()" style="margin-bottom: 10px;">
+            <option value="motor">Motor Symptoms</option>
+            <option value="non_motor">Non-Motor Symptoms</option>
+            <option value="both">Both Motor and Non-Motor Symptoms</option>
+        </select>
+
+        <!-- Specific input fields for Motor Symptoms -->
+        <div id="motorInputs" class="symptom-input">
+            <div class="two-columns">
+                <div>
+                    <input id="NP1PTOT" type="number" placeholder="NP1PTOT"><br>
+                    <input id="NP1RTOT" type="number" placeholder="NP1RTOT"><br>
+                    <input id="NP2PTOT" type="number" placeholder="NP2PTOT"><br>
+                    <input id="PDTRTMNT" type="number" placeholder="PDTRTMNT"><br>
+                </div>
+                <div>
+                    <input id="NP3TOT" type="number" placeholder="NP3TOT"><br>
+                    <input id="DYSKPRES" type="number" placeholder="DYSKPRES"><br>
+                    <input id="NHY" type="number" placeholder="NHY"><br>
+                    <input id="NP4TOT" type="number" placeholder="NP4TOT"><br>
+                    <input id="MSEADLG" type="number" placeholder="MSEADLG"><br>
+                </div>
+            </div>
+        </div>
+
+        <!-- Specific input fields for Non-Motor Symptoms -->
+        <div id="nonMotorInputs" class="symptom-input">
+            <div class="two-columns">
+                <div>
+                    <input id="SDMTOTAL" type="number" placeholder="SDMTOTAL"><br>
+                    <input id="STAI_TOT" type="number" placeholder="STAI_TOT"><br>
+                    <input id="SFT_TOT" type="number" placeholder="SFT_TOT"><br>
+                    <input id="SCOPA_AUT_TOT" type="number" placeholder="SCOPA_AUT_TOT"><br>
+                    <input id="REMSLEEP_TOT" type="number" placeholder="REMSLEEP_TOT"><br>
+                </div>
+                <div>
+                    <input id="QUIP_A" type="number" placeholder="QUIP_A"><br>
+                    <input id="QUIP_B" type="number" placeholder="QUIP_B"><br>
+                    <input id="QUIP_C" type="number" placeholder="QUIP_C"><br>
+                    <input id="QUIP_D" type="number" placeholder="QUIP_D"><br>
+                    <input id="QUIP_E" type="number" placeholder="QUIP_E"><br>
+                </div>
+                <div>
+                    <input id="MoCA_score" type="number" placeholder="MoCA_score"><br>
+                    <input id="LNS_TOT" type="number" placeholder="LNS_TOT"><br>
+                    <input id="HVLT_TOT_Recall" type="number" placeholder="HVLT_TOT_Recall"><br>
+                    <input id="HVLT_DCR_REC" type="number" placeholder="HVLT_DCR_REC"><br>
+                    <input id="HVLT_RETENTION" type="number" placeholder="HVLT_RETENTION"><br>
+                </div>
+                <div>
+                    <input id="GDS_TOT" type="number" placeholder="GDS_TOT"><br>
+                    <input id="GDS_Depressed" type="number" placeholder="GDS_Depressed"><br>
+                    <input id="ESS_TOT" type="number" placeholder="ESS_TOT"><br>
+                    <input id="ESS_Sleepy" type="number" placeholder="ESS_Sleepy"><br>
+                    <input id="BJLOT_TOT" type="number" placeholder="BJLOT_TOT"><br>
+                </div>
+            </div>
+        </div>
+
+        <!-- Button to trigger prediction -->
+        <button onclick="predict()">Predict</button>
+
+        <!-- Placeholder for prediction result -->
+        <p id="prediction" style="margin-top: 20px;"></p>
+    </div>
+
+    <!-- JavaScript for handling symptom type change and prediction -->
+    <script>
+        function handleSymptomTypeChange() {
+            var symptomType = document.getElementById('symptomType').value;
+            var motorInputs = document.getElementById('motorInputs');
+            var nonMotorInputs = document.getElementById('nonMotorInputs');
+
+            // Show/hide specific input fields based on symptom type
+            if (symptomType === 'motor') {
+                motorInputs.style.display = 'block'; // Show motor symptom inputs
+                nonMotorInputs.style.display = 'none'; // Hide non-motor symptom inputs
+            } else if (symptomType === 'non_motor') {
+                motorInputs.style.display = 'none'; // Hide motor symptom inputs
+                nonMotorInputs.style.display = 'block'; // Show non-motor symptom inputs
+            } else {
+                motorInputs.style.display = 'block'; // Show motor symptom inputs
+                nonMotorInputs.style.display = 'block'; // Show non-motor symptom inputs
+            }
+        }
+
+        function predict() {
+            var patientID = document.getElementById('PatientID').value;
+            var symptomType = document.getElementById('symptomType').value;
+
+            var requestData = { patientID: patientID, symptomType: symptomType };
+
+            // Include specific symptom inputs based on symptom type
+            if (symptomType === 'motor') {
+                requestData['NP1PTOT'] = document.getElementById('NP1PTOT').value;
+                requestData['NP1RTOT'] = document.getElementById('NP1RTOT').value;
+                requestData['NP2PTOT'] = document.getElementById('NP2PTOT').value;
+                requestData['PDTRTMNT'] = document.getElementById('PDTRTMNT').value;
+                requestData['NP3TOT'] = document.getElementById('NP3TOT').value;
+                requestData['DYSKPRES'] = document.getElementById('DYSKPRES').value;
+                requestData['NHY'] = document.getElementById('NHY').value;
+                requestData['NP4TOT'] = document.getElementById('NP4TOT').value;
+                requestData['MSEADLG'] = document.getElementById('MSEADLG').value;
+            }
+            else if(symptomType == 'non_motor') { 
+                requestData['SDMTOTAL'] = document.getElementById('SDMTOTAL').value;
+                requestData['STAI_TOT'] = document.getElementById('STAI_TOT').value;
+                requestData['SFT_TOT'] = document.getElementById('SFT_TOT').value;
+                requestData['SCOPA_AUT_TOT'] = document.getElementById('SCOPA_AUT_TOT').value;
+                requestData['REMSLEEP_TOT'] = document.getElementById('REMSLEEP_TOT').value;
+                requestData['QUIP_A'] = document.getElementById('QUIP_A').value;
+                requestData['QUIP_B'] = document.getElementById('QUIP_B').value;
+                requestData['QUIP_C'] = document.getElementById('QUIP_C').value;
+                requestData['QUIP_D'] = document.getElementById('QUIP_D').value;
+                requestData['QUIP_E'] = document.getElementById('QUIP_E').value;
+                requestData['MoCA_score'] = document.getElementById('MoCA_score').value;
+                requestData['LNS_TOT'] = document.getElementById('LNS_TOT').value;
+                requestData['HVLT_TOT_Recall'] = document.getElementById('HVLT_TOT_Recall').value;
+                requestData['HVLT_DCR_REC'] = document.getElementById('HVLT_DCR_REC').value;
+                requestData['HVLT_RETENTION'] = document.getElementById('HVLT_RETENTION').value;
+                requestData['GDS_TOT'] = document.getElementById('GDS_TOT').value;
+                requestData['GDS_Depressed'] = document.getElementById('GDS_Depressed').value;
+                requestData['ESS_TOT'] = document.getElementById('ESS_TOT').value;
+                requestData['ESS_Sleepy'] = document.getElementById('ESS_Sleepy').value;
+                requestData['BJLOT_TOT'] = document.getElementById('BJLOT_TOT').value;
+            }
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('prediction').innerText = 'Prediction: ' + data.prediction;
+            });
+        }
+    </script>
+</body>
+</html>
